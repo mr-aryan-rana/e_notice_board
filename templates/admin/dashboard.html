@@ -1,0 +1,188 @@
+<!-- e_notice_board/templates/admin/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - E-Notice Board</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* margin: 20px; */
+        }
+        .navbar{
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .row {
+            display: flex;
+            /* gap: 5px; */
+            margin-bottom: 20px;
+        }
+
+        .Status {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            flex: 1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            /* text-align: center; */
+        }
+        .card-text{
+            font-size: 2.5rem;
+            font-weight: bold;
+            /* text-align: center; */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            display: flex;
+        }
+
+        .btn {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card-body {
+            display: grid;
+        }
+        @media screen and (max-width: 768px) {
+            .Status {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">E-Notice Board Admin</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin.logout') }}">Logout</a>
+            </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="Status">
+            <div class="status-card text-white bg-primary mb-3">
+                <h2 class="card-title">
+                    Active Notices
+                </h2>
+                <p class="card-text">{{ active_monitors_count }}</p>
+            </div>
+            <div class="status-card text-white bg-success mb-3">
+                <h2 class="card-title">Total Notices</h2>
+                <p class="card-text">{{ total_notices }}</p>
+            </div>
+            <div class="status-card text-white bg-info mb-3">
+                <h2 class="card-title">Active Monitors</h2>
+                <p class="card-text">{{ monitors|length }}</p>
+            </div>
+
+
+            <!-- <div class="col-md-3">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Active Notices</h5>
+                        <p class="card-text display-4">{{ active_notices }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Notices</h5>
+                        <p class="card-text display-4">{{ total_notices }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Active Monitors</h5>
+                        <p class="card-text display-4"></p>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                       
+                        <a href="{{ url_for('admin.add_admin') }}" class="btn btn-success">
+                            <i class="fa-solid fa-user-plus"></i> Add Admin
+                        </a>
+
+                        <a href="{{ url_for('admin.add_notice') }}" class="btn btn-primary me-2 mb-2">Add New Notice</a>
+                        <a href="{{ url_for('admin.list_notices') }}" class="btn btn-info me-2 mb-2">Manage Notices</a>
+                        <a href="{{ url_for('admin.assign_notice') }}" class="btn btn-secondary me-2 mb-2">Assign Notice
+                            to Monitor</a>
+                        <a href="{{ url_for('admin.create_test_data') }}" class="btn btn-warning me-2 mb-2">Create Test
+                            Data</a>
+                        <a href="{{ url_for('monitor.monitor_status') }}" class="btn btn-success mb-2">View Monitor
+                            Status</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Active Monitors</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if monitors %}
+                        <ul class="list-group">
+                            {% for monitor in monitors %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ monitor.name }}
+                                <span class="badge bg-primary rounded-pill">
+                                    <a href="{{ url_for('monitor.display', monitor_id=monitor.id) }}" target="_blank"
+                                        class="text-white">View</a>
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p>No active monitors found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        history.pushState(null, document.title, location.href);
+        window.addEventListener('popstate', function () {
+            location.replace('/admin/login');  // redirect if user tries back
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

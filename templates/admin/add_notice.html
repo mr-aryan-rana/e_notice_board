@@ -1,0 +1,128 @@
+<!-- e_notice_board/templates/admin/add_notice.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Notice</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+                text-align: center;
+        }
+        form {
+            max-width: 600px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 97%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            width: 100%;
+            padding: 10px 20px;
+            align-self: center;
+
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <h1>Add Notice</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Title:</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Content:</label>
+            <textarea name="content" class="form-control" rows="5" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Priority:</label>
+            <select name="priority" class="form-select">
+                <option value="1">Low</option>
+                <option value="2">Medium</option>
+                <option value="3">High</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Position:</label>
+            <select name="position" class="form-select">
+                <option value="top">Top</option>
+                <option value="middle">Middle</option>
+                <option value="bottom">Bottom</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Display Duration (seconds):</label>
+            <input type="number" name="display_duration" class="form-control" value="10">
+        </div>
+
+        <div class="mb-3">
+            <label>Start Time:</label>
+            <input type="datetime-local" name="start_time" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label>End Time:</label>
+            <input type="datetime-local" name="end_time" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label>Select Monitors:</label><br>
+            <input type="checkbox" id="select_all" onclick="toggleAll(this)"> <strong>All</strong><br>
+            {% for monitor in monitors %}
+                <input type="checkbox" name="monitor_ids" value="{{ monitor.id }}"> {{ monitor.name }} - {{ monitor.location }}<br>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Notice</button>
+    </form>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+                Back to Dashboard
+            </a>
+</div>
+
+<script>
+function toggleAll(source) {
+    let checkboxes = document.getElementsByName('monitor_ids');
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+</script>
+
+</body>
+</html>

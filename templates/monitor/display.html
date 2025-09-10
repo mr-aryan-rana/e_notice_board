@@ -1,0 +1,85 @@
+<!-- e_notice_board/templates/monitor/display.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Display - {{ monitor.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        
+        #notice-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .notice-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .notice-content {
+            font-size: 2rem;
+            max-width: 90%;
+        }
+        
+        .priority-high { color: #ff4444; }
+        .priority-medium { color: #ffbb33; }
+        .priority-low { color: #00C851; }
+    </style>
+</head>
+<body>
+<div id="notice-container">
+    {% if not monitor.is_active %}
+    <div class="alert alert-danger">
+        <h1>Monitor Inactive</h1>
+        <p>Monitor: {{ monitor.name }} (ID: {{ monitor.id }})</p>
+        <p>Location: {{ monitor.location }}</p>
+        <p>This monitor is inactive. Please activate it from the admin panel.</p>
+    </div>
+{% elif notices|length == 0 %}
+    <div class="alert alert-warning">
+        <h1>No notices to display</h1>
+        <p>Monitor: {{ monitor.name }} (ID: {{ monitor.id }})</p>
+        <p>Location: {{ monitor.location }}</p>
+        <p>Please check back later or contact administrator</p>
+    </div>
+    {% else %}
+        <!-- Notice container -->
+        <div id="notice-cycle">
+    {% for notice in notices %}
+        <div class="notice" data-duration="{{ notice.display_duration * 1000 }}">
+            <h2>{{ notice.title }}</h2>
+            <p>{{ notice.content }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+    {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/monitor.js') }}"></script>
+<script>
+    const monitorId = {{ monitor.id }};
+    const isActive = {{ monitor.is_active|tojson }};
+    startNoticeCycle(monitorId, isActive);
+</script>
+
+</body>
+</html>

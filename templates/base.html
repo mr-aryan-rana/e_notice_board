@@ -1,0 +1,38 @@
+<!-- e_notice_board/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}E-Notice Board{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>E-Notice Board</h1>
+        <nav>
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> |
+            <a href="{{ url_for('monitor.monitor_status') }}">Monitors</a> |
+            <a href="{{ url_for('admin.logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer style="bottom: 0; width: 100%; text-align: center; padding: 10px; background-color: #f1f1f1;">
+        <p>&copy; {{ current_year }} E-Notice Board</p>
+    </footer>
+</body>
+</html>

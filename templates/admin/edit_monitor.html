@@ -1,0 +1,24 @@
+<!-- e_notice_board/templates/admin/edit_monitor.html -->
+{% extends "base.html" %}
+
+{% block title %}Edit Monitor{% endblock %}
+
+{% block content %}
+<form method="POST">
+    <h2>Edit Monitor</h2>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" value="{{ monitor.name }}" required>
+
+    <label for="location">Location:</label>
+    <input type="text" id="location" name="location" value="{{ monitor.location }}">
+
+    <label for="is_active">Status:</label>
+    <select id="is_active" name="is_active">
+        <option value="1" {% if monitor.is_active %}selected{% endif %}>Active</option>
+        <option value="0" {% if not monitor.is_active %}selected{% endif %}>Blocked</option>
+    </select>
+
+    <button type="submit">Update Monitor</button>
+</form>
+{% endblock %}

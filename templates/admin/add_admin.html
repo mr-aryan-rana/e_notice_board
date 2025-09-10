@@ -1,0 +1,41 @@
+<!-- e_notice_board/templates/admin/add_admin.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Add New Admin</h2>
+
+    <!-- Show flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('admin.add_admin') }}">
+        <div>
+            <label>Username:</label>
+            <input type="text" name="username" required>
+        </div>
+
+        <div>
+            <label>Email:</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <div>
+            <label>Password:</label>
+            <input type="password" name="password" required>
+        </div>
+
+        <div>
+            <label>Confirm Password:</label>
+            <input type="password" name="confirm_password" required>
+        </div>
+
+        <button type="submit">Add Admin</button>
+    </form>
+</div>
+{% endblock %}

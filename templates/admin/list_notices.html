@@ -1,0 +1,117 @@
+<!-- e_notice_board/templates/admin/list_notices.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Notices - E-Notice Board</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">E-Notice Board Admin</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                <a class="nav-link" href="{{ url_for('admin.logout') }}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Manage Notices</h2>
+            <div>
+                <a href="{{ url_for('admin.add_notice') }}" class="btn btn-primary me-2">Add New Notice</a>
+                <a href="{{ url_for('admin.check_expired_notices_route') }}" class="btn btn-warning" 
+                   onclick="return confirm('Check and deactivate all expired notices?')">
+                    Check Expired Notices
+                </a>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% if notices %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>End Time</th>
+                            <th>Assigned Monitors</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notice in notices %}
+                            <tr>
+                                <td>{{ notice.title }}</td>
+                                <td>
+                                    <span class="badge bg-{% if notice.priority == 3 %}danger{% elif notice.priority == 2 %}warning{% else %}success{% endif %}">
+                                        {{ notice.priority }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if notice.is_active %}success{% else %}secondary{% endif %}">
+                                        {{ 'Active' if notice.is_active else 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if notice.end_time %}
+                                        {{ notice.end_time.strftime('%Y-%m-%d %H:%M') }}
+                                        {% if notice.end_time < now %}
+                                            <span class="badge bg-danger">Expired</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">No end time</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if notice.monitors %}
+                                        {% for monitor in notice.monitors %}
+                                            <span class="badge bg-info text-dark">{{ monitor.name }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">None</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ notice.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('admin.edit_notice', notice_id=notice.id) }}" class="btn btn-outline-primary">Edit</a>
+                                        <a href="{{ url_for('admin.delete_notice', notice_id=notice.id) }}" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this notice?')">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No notices found. <a href="{{ url_for('admin.add_notice') }}">Create your first notice</a>.
+            </div>
+        {% endif %}
+        
+        <div class="mt-3">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
