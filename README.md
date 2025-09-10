@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# e_notice_board
-=======
 # E-Notice Board
 
 E-Notice Board is a web-based application built with **Flask** for managing monitors and notices. It allows administrators to create, edit, and assign notices to specific monitors, and displays notices on virtual monitors with scheduling, priority, and status control.

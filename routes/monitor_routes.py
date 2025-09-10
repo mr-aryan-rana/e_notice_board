@@ -14,40 +14,6 @@ from models.base import db
 
 monitor_bp = Blueprint('monitor', __name__)
 
-# -----------------------
-# Monitor Notice Display
-# -----------------------
-# @monitor_bp.route('/display/<int:monitor_id>')
-# def display(monitor_id):
-#     monitor = Monitor.query.get_or_404(monitor_id)
-
-#     # ✅ Ensure proper boolean check
-#     if not bool(monitor.is_active):
-#         return render_template('monitor/blocked.html', monitor=monitor)
-
-#     now = datetime.utcnow()
-
-#     # ✅ Fetch only active and assigned notices
-#     assignments = (
-#         Assignment.query.join(Notice)
-#         .filter(
-#             Assignment.monitor_id == monitor.id,
-#             Notice.is_active == True,
-#             Notice.start_time <= now,
-#             db.or_(Notice.end_time.is_(None), Notice.end_time >= now)
-#         )
-#         .order_by(Notice.priority.desc(), Notice.created_at.desc())
-#         .all()
-#     )
-
-#     notices = [a.notice for a in assignments]
-
-#     print(f"Monitor {monitor.name} will display {len(notices)} notices.")
-#     for n in notices:
-#         print(f"- {n.title} (priority={n.priority})")
-
-#     return render_template('monitor/display.html', monitor=monitor, notices=notices)
-
 @monitor_bp.route('/display/<int:monitor_id>')
 def display(monitor_id):
     monitor = Monitor.query.get_or_404(monitor_id)
@@ -70,6 +36,7 @@ def display(monitor_id):
 def api_display(monitor_id):
     """Return assigned notices as JSON for a monitor."""
     monitor = Monitor.query.get_or_404(monitor_id)
+    
     if not monitor.is_active:
         return jsonify({"status": "blocked", "message": "This monitor is blocked"}), 403
 
@@ -100,13 +67,12 @@ def api_display(monitor_id):
             'content': n.content,
             'priority': n.priority,
             'position': n.position,
-            'display_duration': n.display_duration * 1000  # milliseconds for frontend
+            'display_duration': n.display_duration  # send in seconds
         }
         for n in (a.notice for a in assignments)
     ]
 
     return jsonify(notices_data)
-
 
 # -----------------------
 # Monitor Status Page

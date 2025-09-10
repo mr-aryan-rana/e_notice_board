@@ -1,6 +1,7 @@
 let currentNoticeIndex = 0;
 let notices = [];
 let noticeInterval;
+let fetchInterval;
 
 function startNoticeCycle(monitorId, isActive) {
     if (!isActive) {
@@ -8,30 +9,36 @@ function startNoticeCycle(monitorId, isActive) {
         return;
     }
 
+    // Initial fetch
     fetchNotices(monitorId);
 
-    // Refresh notices every 1 minute
-    setInterval(() => {
+    // Refresh notices every 60 seconds
+    fetchInterval = setInterval(() => {
         fetchNotices(monitorId);
-    }, 60000);
+    }, 60000); // 60,000 ms = 60 sec
 }
 
 function fetchNotices(monitorId) {
     fetch(`/monitor/api/display/${monitorId}`)
         .then(response => {
             if (response.status === 403) {
-                // Monitor blocked
                 showBlockedMonitor();
                 return [];
             }
             return response.json();
         })
         .then(data => {
-            notices = data;
-            if (!notices || notices.length === 0) {
+            if (!data || data.length === 0) {
+                notices = [];
                 showNoNotice();
             } else {
-                currentNoticeIndex = 0;
+                const currentId = notices[currentNoticeIndex]?.id;
+                notices = data;
+
+                // Maintain current notice if still available
+                const newIndex = notices.findIndex(n => n.id === currentId);
+                currentNoticeIndex = newIndex >= 0 ? newIndex : 0;
+
                 displayNotice(currentNoticeIndex);
             }
         })
@@ -65,13 +72,13 @@ function displayNotice(index) {
     container.appendChild(titleEl);
     container.appendChild(contentEl);
 
+    // Rotate to next notice after display_duration (seconds)
     clearTimeout(noticeInterval);
     noticeInterval = setTimeout(() => {
         currentNoticeIndex = (currentNoticeIndex + 1) % notices.length;
         displayNotice(currentNoticeIndex);
-    }, notice.display_duration * 1000); // ensure milliseconds
+    }, notice.display_duration * 1000); // convert seconds to ms
 }
-
 
 function showNoNotice() {
     const container = document.getElementById('notice-container');
@@ -79,8 +86,8 @@ function showNoNotice() {
         <h1>No notices to display</h1>
         <p>Monitor is active but has no assigned notices.</p>
     `;
+    clearTimeout(noticeInterval);
 }
-
 
 function showBlockedMonitor() {
     const container = document.getElementById('notice-container');
@@ -90,6 +97,8 @@ function showBlockedMonitor() {
             <p>This monitor is currently blocked. Notices cannot be displayed.</p>
         </div>
     `;
+    clearTimeout(noticeInterval);
+    clearInterval(fetchInterval);
 }
 
 function getPriorityClass(priority) {

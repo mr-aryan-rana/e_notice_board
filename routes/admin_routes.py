@@ -28,6 +28,62 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ==========================
+# ADMIN MANAGEMENT
+# ==========================
+
+@admin_bp.route('/admins')
+@login_required
+def list_admins():
+    """List all admins"""
+    admins = Admin.query.all()
+    return render_template('admin/list_admins.html', admins=admins)
+
+@admin_bp.route('/admins/edit/<int:admin_id>', methods=['GET', 'POST'])
+@login_required
+def edit_admin(admin_id):
+    """Edit admin details (username, email, status)"""
+    admin = Admin.query.get_or_404(admin_id)
+    if request.method == 'POST':
+        admin.username = request.form.get('username')
+        admin.email = request.form.get('email')
+        admin.is_active = True if request.form.get('is_active') else False
+        db.session.commit()
+        flash("Admin updated successfully!", "success")
+        return redirect(url_for('admin.list_admins'))
+    return render_template('admin/edit_admin.html', admin=admin)
+
+@admin_bp.route('/admins/delete/<int:admin_id>', methods=['POST'])
+@login_required
+def delete_admin(admin_id):
+    """Delete admin account (prevent self-deletion)"""
+    if session.get('admin_id') == admin_id:
+        flash("You cannot delete your own account while logged in.", "danger")
+        return redirect(url_for('admin.list_admins'))
+
+    admin = Admin.query.get_or_404(admin_id)
+    db.session.delete(admin)
+    db.session.commit()
+    flash("Admin deleted successfully!", "success")
+    return redirect(url_for('admin.list_admins'))
+
+@admin_bp.route('/admins/reset_password/<int:admin_id>', methods=['GET', 'POST'])
+@login_required
+def reset_admin_password(admin_id):
+    """Reset admin password"""
+    admin = Admin.query.get_or_404(admin_id)
+    if request.method == 'POST':
+        new_password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        if new_password != confirm_password:
+            flash("Passwords do not match!", "danger")
+            return redirect(url_for('admin.reset_admin_password', admin_id=admin.id))
+        admin.set_password(new_password)
+        db.session.commit()
+        flash("Password reset successfully!", "success")
+        return redirect(url_for('admin.list_admins'))
+    return render_template('admin/reset_admin_password.html', admin=admin)
+
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
