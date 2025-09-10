@@ -61,7 +61,7 @@ some additional file for testing checking ignore that all files
 ### 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/mr-aryan-rana/e_notice_board.git
 ```
 ```
 cd e_notice_board
